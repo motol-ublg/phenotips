@@ -1126,19 +1126,23 @@ define([
                     this.setBirthDate(info.dob);
                 }
                 if(info.disorders) {
-                    this.setDisorders(info.disorders);
+                    var disordersCopy = Helpers.cloneObject(info.disorders);
+                    this.setDisorders(disordersCopy);
                 }
                 if(info.cancers) {
-                    this.setCancers(info.cancers);
+                	var cancersCopy = Helpers.cloneObject(info.cancers);
+                    this.setCancers(cancersCopy);
                 }
                 if(info.hpoTerms) {
                     this.setHPO(info.hpoTerms);
                 }
                 if(info.ethnicities) {
-                    this.setEthnicities(info.ethnicities);
+                	var ethnicitiesCopy = Helpers.cloneObject(info.ethnicities);
+                    this.setEthnicities(ethnicitiesCopy);
                 }
                 if(info.candidateGenes) {
-                    this.setGenes(info.candidateGenes);
+                	var candidateGenes = Helpers.cloneObject(info.candidateGenes);
+                    this.setGenes(candidateGenes);
                 }
                 if(info.hasOwnProperty("adoptedStatus") && this.getAdopted() != info.adoptedStatus) {
                     this.setAdopted(info.adoptedStatus);
@@ -1159,7 +1163,8 @@ define([
                     this.setChildlessReason(info.childlessReason);
                 }
                 if(info.hasOwnProperty("twinGroup") && this._twinGroup != info.twinGroup) {
-                    this.setTwinGroup(info.twinGroup);
+                	var twinGroup = Helpers.cloneObject(info.twinGroup);
+                    this.setTwinGroup(twinGroup);
                 }
                 if(info.hasOwnProperty("monozygotic") && this._monozygotic != info.monozygotic) {
                     this.setMonozygotic(info.monozygotic);
