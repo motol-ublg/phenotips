@@ -392,7 +392,10 @@ public class DataToCellConverter
         if (enabledFields.remove("external_id")) {
             present.add("external_id");
         }
-        if (present.size() == 0) {
+        if (enabledFields.remove("family_id")) {
+            present.add("family_id");
+        }
+        if (present.isEmpty()) {
             return null;
         }
         this.enabledHeaderIdsBySection.put(sectionName, present);
@@ -410,6 +413,12 @@ public class DataToCellConverter
         if (present.contains("external_id")) {
             DataCell externalIdCell = new DataCell("Patient Identifier", x, 1, StyleOption.HEADER);
             section.addCell(externalIdCell);
+            x++;
+        }
+        if (present.contains("family_id")) {
+            DataCell familyIdCell = new DataCell("Family Identifier", x, 1, StyleOption.HEADER);
+            section.addCell(familyIdCell);
+            x++;
         }
         // section.finalizeToMatrix();
         return section;
@@ -433,6 +442,12 @@ public class DataToCellConverter
         if (present.contains("external_id")) {
             DataCell cell = new DataCell(patient.getExternalId(), x, 0);
             section.addCell(cell);
+            x++;
+        }
+        if (present.contains("family_id")) {
+            DataCell cell = new DataCell(patient.<String>getData("identifiers").get("family_id"), x, 0);
+            section.addCell(cell);
+            x++;
         }
         // section.finalizeToMatrix();
         return section;

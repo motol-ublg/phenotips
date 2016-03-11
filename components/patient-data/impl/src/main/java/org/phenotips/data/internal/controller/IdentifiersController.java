@@ -26,9 +26,11 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -56,9 +58,12 @@ import net.sf.json.JSONObject;
 @Singleton
 public class IdentifiersController implements PatientDataController<String>
 {
-    private static final String DATA_NAME = "identifiers";
+    /**
+     * Section name.
+     */
+    public static final String DATA_NAME = "identifiers";
 
-    private static final String EXTERNAL_IDENTIFIER_PROPERTY_NAME = "external_id";
+    private static final List<? extends String> IDS = Arrays.asList("external_id", "family_id");
 
     /** Logging helper object. */
     @Inject
@@ -82,7 +87,9 @@ public class IdentifiersController implements PatientDataController<String>
                 return null;
             }
             Map<String, String> result = new LinkedHashMap<String, String>();
-            result.put(EXTERNAL_IDENTIFIER_PROPERTY_NAME, data.getStringValue(EXTERNAL_IDENTIFIER_PROPERTY_NAME));
+            for (String idProperty : IDS) {
+                result.put(idProperty, data.getStringValue(idProperty));
+            }
             return new DictionaryPatientData<>(DATA_NAME, result);
         } catch (Exception e) {
             this.logger.error("Could not find requested document or some unforeseen"
@@ -105,8 +112,10 @@ public class IdentifiersController implements PatientDataController<String>
             if (!identifiers.isNamed()) {
                 return;
             }
-            String externalId = identifiers.get(EXTERNAL_IDENTIFIER_PROPERTY_NAME);
-            data.setStringValue(EXTERNAL_IDENTIFIER_PROPERTY_NAME, externalId);
+            for (String idProperty : IDS) {
+                String externalId = identifiers.get(idProperty);
+                data.setStringValue(idProperty, externalId);
+            }
 
             XWikiContext context = (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
             context.getWiki().saveDocument(doc, "Updated identifiers from JSON", true, context);
@@ -124,9 +133,6 @@ public class IdentifiersController implements PatientDataController<String>
     @Override
     public void writeJSON(Patient patient, JSONObject json, Collection<String> selectedFieldNames)
     {
-        if (selectedFieldNames != null && !selectedFieldNames.contains(EXTERNAL_IDENTIFIER_PROPERTY_NAME)) {
-            return;
-        }
 
         PatientData<String> patientData = patient.<String>getData(DATA_NAME);
         if (patientData != null && patientData.isNamed()) {
@@ -134,7 +140,9 @@ public class IdentifiersController implements PatientDataController<String>
 
             while (values.hasNext()) {
                 Entry<String, String> datum = values.next();
-                if (StringUtils.isNotBlank(datum.getValue())) {
+                if (StringUtils.isNotBlank(datum.getValue())
+                        && (selectedFieldNames == null
+                            || selectedFieldNames.contains(datum.getKey()))) {
                     json.put(datum.getKey(), datum.getValue());
                 }
             }
@@ -144,14 +152,11 @@ public class IdentifiersController implements PatientDataController<String>
     @Override
     public PatientData<String> readJSON(JSONObject json)
     {
-        if (!json.containsKey(EXTERNAL_IDENTIFIER_PROPERTY_NAME)) {
-            // no data supported by this controller is present in provided JSON
-            return null;
-        }
-        String externalId = json.getString(EXTERNAL_IDENTIFIER_PROPERTY_NAME);
-
         Map<String, String> result = new LinkedHashMap<String, String>();
-        result.put(EXTERNAL_IDENTIFIER_PROPERTY_NAME, externalId);
+        for (String idProperty : IDS) {
+            String externalId = json.getString(idProperty);
+            result.put(idProperty, externalId);
+        }
         return new DictionaryPatientData<String>(DATA_NAME, result);
     }
 
