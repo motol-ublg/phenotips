@@ -416,17 +416,17 @@ public class DataToCellConverter
         if (present.contains("external_id")) {
             DataCell externalIdCell = new DataCell("Patient Identifier", x, 1, StyleOption.HEADER);
             section.addCell(externalIdCell);
-            hX++;
+            x++;
         }
         if (present.contains("family_id")) {
-            DataCell familyIdCell = new DataCell("Family Identifier", hX, 1, StyleOption.HEADER);
+            DataCell familyIdCell = new DataCell("Family Identifier", x, 1, StyleOption.HEADER);
             section.addCell(familyIdCell);
-            hX++;
+            x++;
         }
         if (present.contains("birth_number")) {
-            DataCell birthNumberCell = new DataCell("Birth Number", hX, 1, StyleOption.HEADER);
+            DataCell birthNumberCell = new DataCell("Birth Number", x, 1, StyleOption.HEADER);
             section.addCell(birthNumberCell);
-            hX++;
+            x++;
         }
         // section.finalizeToMatrix();
         return section;
@@ -1395,4 +1395,93 @@ public class DataToCellConverter
         }
         return reference.getName();
     }
+
+    private Set<String> addHeaders(String[] fieldIds, String[][] headerIds, Set<String> enabledFields)
+    {
+        Set<String> present = new HashSet<String>();
+        int counter = 0;
+        for (String fieldId : fieldIds) {
+            if (enabledFields.remove(fieldId)) {
+                for (String headerId : headerIds[counter]) {
+                    present.add(headerId);
+                }
+            }
+            counter++;
+        }
+        return present;
+    }
+
+    private String parseEvidence(String value)
+    {
+        if (StringUtils.isBlank(value)) {
+            return "";
+        }
+        Map<String, String> valueTranslates = new HashMap<String, String>();
+        valueTranslates.put("rare", "Rare (MAF<0.01); ");
+        valueTranslates.put("predicted", "Predicted damaging by in silico models; ");
+        valueTranslates.put("reported", "Reported in other affected individuals; ");
+        String field = "";
+        for (String property : valueTranslates.keySet()) {
+            if (value.contains(property)) {
+                field += valueTranslates.get(property);
+            }
+        }
+        return field;
+    }
+
+    DataSection sampleInformationHeader(Set<String> enabledFields) {
+        String sectionName = "sampleInformation";
+
+        // Must be linked to keep order; in other sections as well
+        Map<String, String> fieldToHeaderMap = new LinkedHashMap<>();
+        fieldToHeaderMap.put("sample_date", "Sample Date");
+
+        Set<String> present = new LinkedHashSet<>();
+        for (String fieldId : fieldToHeaderMap.keySet()) {
+            if (enabledFields.remove(fieldId)) {
+                present.add(fieldId);
+            }
+        }
+        this.enabledHeaderIdsBySection.put(sectionName, present);
+
+        DataSection headerSection = new DataSection();
+        if (present.isEmpty()) {
+            return null;
+        }
+
+        int hX = 0;
+        for (String fieldId : present) {
+            DataCell headerCell = new DataCell(fieldToHeaderMap.get(fieldId), hX, 1, StyleOption.HEADER);
+            headerSection.addCell(headerCell);
+            hX++;
+        }
+        DataCell headerCell = new DataCell("Sample Information", 0, 0, StyleOption.LARGE_HEADER);
+        headerCell.addStyle(StyleOption.HEADER);
+        headerSection.addCell(headerCell);
+
+        return headerSection;
+    }
+
+    DataSection sampleInformationBody(Patient patient) {
+        String sectionName = "sampleInformation";
+        Set<String> present = this.enabledHeaderIdsBySection.get(sectionName);
+        if (present == null || present.isEmpty()) {
+            return null;
+        }
+        DataSection bodySection = new DataSection();
+        PatientData<Object> patientData = patient.getData("sample_information");
+
+        int x = 0;
+        if (present.contains("sample_date")) {
+            SimpleDateFormat format = new SimpleDateFormat("yyyy.MM.dd");
+            Date value = patientData != null ? (Date) patientData.get("sample_date") : null;
+
+            DataCell cell = new DataCell(value != null ? format.format(value) : "", x, 0);
+            bodySection.addCell(cell);
+            x++;
+        }
+
+        return bodySection;
+    }
+
 }
