@@ -1486,4 +1486,59 @@ public class DataToCellConverter
         return field;
     }
 
+    DataSection sampleInformationHeader(Set<String> enabledFields) {
+        String sectionName = "sampleInformation";
+
+        // Must be linked to keep order; in other sections as well
+        Map<String, String> fieldToHeaderMap = new LinkedHashMap<>();
+        fieldToHeaderMap.put("sample_date", "Sample Date");
+
+        Set<String> present = new LinkedHashSet<>();
+        for (String fieldId : fieldToHeaderMap.keySet()) {
+            if (enabledFields.remove(fieldId)) {
+                present.add(fieldId);
+            }
+        }
+        this.enabledHeaderIdsBySection.put(sectionName, present);
+
+        DataSection headerSection = new DataSection();
+        if (present.isEmpty()) {
+            return null;
+        }
+
+        int hX = 0;
+        for (String fieldId : present) {
+            DataCell headerCell = new DataCell(fieldToHeaderMap.get(fieldId), hX, 1, StyleOption.HEADER);
+            headerSection.addCell(headerCell);
+            hX++;
+        }
+        DataCell headerCell = new DataCell("Sample Information", 0, 0, StyleOption.LARGE_HEADER);
+        headerCell.addStyle(StyleOption.HEADER);
+        headerSection.addCell(headerCell);
+
+        return headerSection;
+    }
+
+    DataSection sampleInformationBody(Patient patient) {
+        String sectionName = "sampleInformation";
+        Set<String> present = this.enabledHeaderIdsBySection.get(sectionName);
+        if (present == null || present.isEmpty()) {
+            return null;
+        }
+        DataSection bodySection = new DataSection();
+        PatientData<Object> patientData = patient.getData("sample_information");
+
+        int x = 0;
+        if (present.contains("sample_date")) {
+            SimpleDateFormat format = new SimpleDateFormat("yyyy.MM.dd");
+            Date value = patientData != null ? (Date) patientData.get("sample_date") : null;
+
+            DataCell cell = new DataCell(value != null ? format.format(value) : "", x, 0);
+            bodySection.addCell(cell);
+            x++;
+        }
+
+        return bodySection;
+    }
+
 }
