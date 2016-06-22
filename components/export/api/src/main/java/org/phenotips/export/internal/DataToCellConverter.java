@@ -1491,7 +1491,7 @@ public class DataToCellConverter
 
         // Must be linked to keep order; in other sections as well
         Map<String, String> fieldToHeaderMap = new LinkedHashMap<>();
-        fieldToHeaderMap.put("sample_date", "Sample Date");
+        fieldToHeaderMap.put("sample_date", "Sample Received Date");
 
         Set<String> present = new LinkedHashSet<>();
         for (String fieldId : fieldToHeaderMap.keySet()) {
