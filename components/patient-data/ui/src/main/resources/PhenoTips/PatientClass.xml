@@ -655,7 +655,7 @@
 <run_number>
       <customDisplay/>
       <disabled>0</disabled>
-      <name>external_id</name>
+      <name>run_number</name>
       <number>55</number>
       <picker>0</picker>
       <prettyName>Run Number</prettyName>
