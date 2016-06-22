@@ -1492,6 +1492,7 @@ public class DataToCellConverter
         // Must be linked to keep order; in other sections as well
         Map<String, String> fieldToHeaderMap = new LinkedHashMap<>();
         fieldToHeaderMap.put("sample_date", "Sample Received Date");
+        fieldToHeaderMap.put("illumina_date", "Illumina Analysis Date");
 
         Set<String> present = new LinkedHashSet<>();
         for (String fieldId : fieldToHeaderMap.keySet()) {
@@ -1532,6 +1533,14 @@ public class DataToCellConverter
         if (present.contains("sample_date")) {
             SimpleDateFormat format = new SimpleDateFormat("yyyy.MM.dd");
             Date value = patientData != null ? (Date) patientData.get("sample_date") : null;
+
+            DataCell cell = new DataCell(value != null ? format.format(value) : "", x, 0);
+            bodySection.addCell(cell);
+            x++;
+        }
+        if (present.contains("illumina_date")) {
+            SimpleDateFormat format = new SimpleDateFormat("yyyy.MM.dd");
+            Date value = patientData != null ? (Date) patientData.get("illumina_date") : null;
 
             DataCell cell = new DataCell(value != null ? format.format(value) : "", x, 0);
             bodySection.addCell(cell);
