@@ -1436,6 +1436,7 @@ public class DataToCellConverter
         Map<String, String> fieldToHeaderMap = new LinkedHashMap<>();
         fieldToHeaderMap.put("sample_date", "Sample Received Date");
         fieldToHeaderMap.put("illumina_date", "Illumina Analysis Date");
+        fieldToHeaderMap.put("run_number", "Run Number");
 
         Set<String> present = new LinkedHashSet<>();
         for (String fieldId : fieldToHeaderMap.keySet()) {
@@ -1486,6 +1487,11 @@ public class DataToCellConverter
             Date value = patientData != null ? (Date) patientData.get("illumina_date") : null;
 
             DataCell cell = new DataCell(value != null ? format.format(value) : "", x, 0);
+            bodySection.addCell(cell);
+            x++;
+        }
+        if (present.contains("run_number")) {
+            DataCell cell = new DataCell(patient.<String>getData("identifiers").get("run_number"), x, 0);
             bodySection.addCell(cell);
             x++;
         }
