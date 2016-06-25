@@ -24,17 +24,20 @@ import com.xpn.xwiki.objects.BaseObject;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.logging.Level;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
+import org.json.JSONException;
 
 import org.xwiki.component.annotation.Component;
 
@@ -60,7 +63,12 @@ import org.xwiki.bridge.DocumentAccessBridge;
 @Singleton
 public class SampleInformationController implements PatientDataController<Object>
 {
-    private static final String SAMPLE_DATE_FIELD = "sample_date";
+
+    private static final String[] DATE_IDENTIFIERS = new String[]{
+        "sample_date", "illumina_date" };
+    private static final String[] STRING_IDENTIFIERS = new String[]{
+        "run_number", "udmp_number", "motol_number", "illumina_number" };
+
 
     /** Provides access to the underlying data storage. */
     @Inject
@@ -86,13 +94,23 @@ public class SampleInformationController implements PatientDataController<Object
             if (data == null) {
                 return null;
             }
-            Map<String, Object> result = new LinkedHashMap<>();
-            Date sampleDate = data.getDateValue(SAMPLE_DATE_FIELD);
-                if (sampleDate != null) {
-                    result.put(SAMPLE_DATE_FIELD, sampleDate);
-                }
+            Map<String, Object> result = new LinkedHashMap<String, Object>();
 
-            return new DictionaryPatientData<>(getName(), result);
+            for (String identifierName : DATE_IDENTIFIERS) {
+                Date date = data.getDateValue(identifierName);
+                if (date != null) {
+                    result.put(identifierName, date);
+                }
+            }
+
+            for (String identifierName : STRING_IDENTIFIERS) {
+                String value = data.getStringValue(identifierName);
+                if (value != null) {
+                    result.put(identifierName, value);
+                }
+            }
+
+            return new DictionaryPatientData<Object>(getName(), result);
         } catch (Exception e) {
             this.logger.error("Could not find requested document or some unforeseen"
                 + " error has occurred during controller loading ", e.getMessage());
@@ -110,11 +128,18 @@ public class SampleInformationController implements PatientDataController<Object
                 throw new IllegalArgumentException(ERROR_MESSAGE_NO_PATIENT_CLASS);
             }
 
-            PatientData<Object> data = patient.<Object>getData(this.getName());
+            PatientData<Object> data = patient.getData(this.getName());
             if (!data.isNamed()) {
                 return;
             }
-            xwikiDataObject.setDateValue(SAMPLE_DATE_FIELD, (Date) data.get(SAMPLE_DATE_FIELD));
+
+            for (String identifierName : DATE_IDENTIFIERS) {
+                xwikiDataObject.setDateValue(identifierName, (Date) data.get(identifierName));
+            }
+
+            for (String identifierName : STRING_IDENTIFIERS) {
+                xwikiDataObject.setStringValue(identifierName, (String) data.get(identifierName));
+            }
 
             XWikiContext context = this.contextProvider.get();
             String comment = String.format("Updated %s from JSON", this.getName());
@@ -138,20 +163,30 @@ public class SampleInformationController implements PatientDataController<Object
             return;
         }
 
-        DateFormat dateFormat =
-            new SimpleDateFormat(this.configurationManager.getActiveConfiguration().getISODateFormat());
-
         JSONObject container = json.optJSONObject(getName());
 
-        if (selectedFieldNames == null || selectedFieldNames.contains(SAMPLE_DATE_FIELD)) {
+        Set<String> fieldsToWrite = new HashSet<String>(Arrays.asList(STRING_IDENTIFIERS));
+        fieldsToWrite.addAll(Arrays.asList(DATE_IDENTIFIERS));
+        fieldsToWrite.retainAll(selectedFieldNames);
+
+        if (selectedFieldNames == null || !fieldsToWrite.isEmpty()) {
+
             if (container == null) {
                 // put() is placed here because we want to create the property iff at least one field is set/enabled
                 json.put(getName(), new JSONObject());
                 container = json.optJSONObject(getName());
             }
-            container.put(SAMPLE_DATE_FIELD, dateFormat.format(data.get(SAMPLE_DATE_FIELD)));
-        }
+            DateFormat dateFormat =
+                new SimpleDateFormat(this.configurationManager.getActiveConfiguration().getISODateFormat());
 
+            for (String identifierName : DATE_IDENTIFIERS) {
+                container.put(identifierName, dateFormat.format(data.get(identifierName)));
+            }
+
+            for (String identifierName : STRING_IDENTIFIERS) {
+                container.put(identifierName, data.get(identifierName));
+            }
+        }
     }
 
     @Override
@@ -162,9 +197,6 @@ public class SampleInformationController implements PatientDataController<Object
             return null;
         }
 
-        DateFormat dateFormat =
-            new SimpleDateFormat(this.configurationManager.getActiveConfiguration().getISODateFormat());
-
         Map<String, Object> result = new LinkedHashMap<String, Object>();
 
         // since the loader always returns dictionary data, this should always be a block.
@@ -174,19 +206,36 @@ public class SampleInformationController implements PatientDataController<Object
         }
         JSONObject jsonBlock = (JSONObject) jsonBlockObject;
 
-        if (jsonBlock.has(SAMPLE_DATE_FIELD)) {
-            Date val;
-            try {
-                val = dateFormat.parse(jsonBlock.getString(""));
-            } catch (ParseException ex) {
-                java.util.logging.Logger.getLogger(
-                        SampleInformationController.class.getName()).log(Level.SEVERE, null, ex);
-                val = new Date(0);
-            }
-            result.put(SAMPLE_DATE_FIELD, val);
+        for (String identifierName : DATE_IDENTIFIERS) {
+            extractJsonDateField(jsonBlock, result, identifierName);
         }
 
-        return new DictionaryPatientData<>(this.getName(), result);
+        for (String identifierName : STRING_IDENTIFIERS) {
+            if (jsonBlock.has(identifierName)) {
+                result.put(identifierName, jsonBlock.getString(identifierName));
+            }
+        }
+
+        return new DictionaryPatientData<Object>(this.getName(), result);
+    }
+
+    private void extractJsonDateField(JSONObject jsonBlock,
+            Map<String, Object> result,
+            String fieldName) throws JSONException {
+
+        if (jsonBlock.has(fieldName)) {
+            DateFormat dateFormat = new SimpleDateFormat(this.configurationManager
+                    .getActiveConfiguration().getISODateFormat());
+
+            Date val;
+            try {
+                val = dateFormat.parse(jsonBlock.getString(fieldName));
+            } catch (ParseException ex) {
+                logger.error("Error parsing date in field " + fieldName, ex);
+                val = new Date(0);
+            }
+            result.put(fieldName, val);
+        }
     }
 
     @Override
