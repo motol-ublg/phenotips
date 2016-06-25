@@ -167,9 +167,11 @@ public class SampleInformationController implements PatientDataController<Object
 
         Set<String> fieldsToWrite = new HashSet<String>(Arrays.asList(STRING_IDENTIFIERS));
         fieldsToWrite.addAll(Arrays.asList(DATE_IDENTIFIERS));
-        fieldsToWrite.retainAll(selectedFieldNames);
+        if (selectedFieldNames != null) {
+            fieldsToWrite.retainAll(selectedFieldNames);
+        }
 
-        if (selectedFieldNames == null || !fieldsToWrite.isEmpty()) {
+        if (!fieldsToWrite.isEmpty()) {
 
             if (container == null) {
                 // put() is placed here because we want to create the property iff at least one field is set/enabled
