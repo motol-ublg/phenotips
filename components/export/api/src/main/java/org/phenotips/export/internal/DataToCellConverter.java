@@ -1494,6 +1494,9 @@ public class DataToCellConverter
         fieldToHeaderMap.put("sample_date", "Sample Received Date");
         fieldToHeaderMap.put("illumina_date", "Illumina Analysis Date");
         fieldToHeaderMap.put("run_number", "Run Number");
+        fieldToHeaderMap.put("udmp_number", "UDMP Number");
+        fieldToHeaderMap.put("motol_number", "Motol Number");
+        fieldToHeaderMap.put("illumina_number", "Illumina Number");
 
         Set<String> present = new LinkedHashSet<>();
         for (String fieldId : fieldToHeaderMap.keySet()) {
@@ -1548,11 +1551,25 @@ public class DataToCellConverter
             x++;
         }
         if (present.contains("run_number")) {
-            DataCell cell = new DataCell(patient.<String>getData("identifiers").get("run_number"), x, 0);
+            DataCell cell = new DataCell(patientData == null ? "" : (String) patientData.get("run_number"), x, 0);
             bodySection.addCell(cell);
             x++;
         }
-
+        if (present.contains("udmp_number")) {
+            DataCell cell = new DataCell(patientData == null ? "" : (String) patientData.get("udmp_number"), x, 0);
+            bodySection.addCell(cell);
+            x++;
+        }
+        if (present.contains("motol_number")) {
+            DataCell cell = new DataCell(patientData == null ? "" : (String) patientData.get("motol_number"), x, 0);
+            bodySection.addCell(cell);
+            x++;
+        }
+        if (present.contains("illumina_number")) {
+            DataCell cell = new DataCell(patientData == null ? "" : (String) patientData.get("illumina_number"), x, 0);
+            bodySection.addCell(cell);
+            x++;
+        }
         return bodySection;
     }
 

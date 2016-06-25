@@ -652,7 +652,7 @@
       <classType>com.xpn.xwiki.objects.classes.DateClass</classType>
     </illumina_date>
 
-<run_number>
+    <run_number>
       <customDisplay/>
       <disabled>0</disabled>
       <name>run_number</name>
@@ -665,6 +665,48 @@
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </run_number>
+
+    <udmp_number>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <name>udmp_number</name>
+      <number>56</number>
+      <picker>0</picker>
+      <prettyName>UDMP Number</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </udmp_number>
+
+    <motol_number>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <name>motol_number</name>
+      <number>57</number>
+      <picker>0</picker>
+      <prettyName>Motol Number</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </motol_number>
+
+    <illumina_number>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <name>illumina_number</name>
+      <number>57</number>
+      <picker>0</picker>
+      <prettyName>Illumina Number</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </illumina_number>
 
     <family_history>
       <contenttype>PureText</contenttype>
