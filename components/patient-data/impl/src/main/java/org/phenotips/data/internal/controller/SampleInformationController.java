@@ -67,7 +67,7 @@ public class SampleInformationController implements PatientDataController<Object
     private static final String[] DATE_IDENTIFIERS = new String[]{
         "sample_date", "illumina_date" };
     private static final String[] STRING_IDENTIFIERS = new String[]{
-        "run_number", "udmp_number", "motol_number", "illumina_number" };
+        "run_number", "udmp_number", "motol_number", "illumina_number", "storage_place", "sample_material", "ngs_material" };
 
 
     /** Provides access to the underlying data storage. */

@@ -1497,6 +1497,9 @@ public class DataToCellConverter
         fieldToHeaderMap.put("udmp_number", "UDMP Number");
         fieldToHeaderMap.put("motol_number", "Motol Number");
         fieldToHeaderMap.put("illumina_number", "Illumina Number");
+        fieldToHeaderMap.put("storage_place", "Storage Place");
+        fieldToHeaderMap.put("sample_material", "Sample Material");
+        fieldToHeaderMap.put("ngs_material", "NGS Material");
 
         Set<String> present = new LinkedHashSet<>();
         for (String fieldId : fieldToHeaderMap.keySet()) {
@@ -1567,6 +1570,21 @@ public class DataToCellConverter
         }
         if (present.contains("illumina_number")) {
             DataCell cell = new DataCell(patientData == null ? "" : (String) patientData.get("illumina_number"), x, 0);
+            bodySection.addCell(cell);
+            x++;
+        }
+        if (present.contains("storage_place")) {
+            DataCell cell = new DataCell(patientData == null ? "" : (String) patientData.get("storage_place"), x, 0);
+            bodySection.addCell(cell);
+            x++;
+        }
+        if (present.contains("sample_material")) {
+            DataCell cell = new DataCell(patientData == null ? "" : (String) patientData.get("sample_material"), x, 0);
+            bodySection.addCell(cell);
+            x++;
+        }
+        if (present.contains("ngs_material")) {
+            DataCell cell = new DataCell(patientData == null ? "" : (String) patientData.get("ngs_material"), x, 0);
             bodySection.addCell(cell);
             x++;
         }
