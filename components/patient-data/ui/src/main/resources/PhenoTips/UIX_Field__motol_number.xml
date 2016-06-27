@@ -122,7 +122,7 @@
     </property>
     <property>
       <parameters>title=$services.localization.render('phenotips.UIXField.motolNumber')
-enabled=false
+enabled=true
 required=
 order=9
 fields=motol_number
