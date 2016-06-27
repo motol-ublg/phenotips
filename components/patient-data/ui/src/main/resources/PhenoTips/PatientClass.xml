@@ -708,6 +708,48 @@
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </illumina_number>
 
+    <storage_place>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <name>storage_place</name>
+      <number>58</number>
+      <picker>0</picker>
+      <prettyName>Storage Place</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </storage_place>
+
+    <sample_material>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <name>sample_material</name>
+      <number>59</number>
+      <picker>0</picker>
+      <prettyName>Sample Material</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </sample_material>
+
+    <ngs_material>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <name>ngs_material</name>
+      <number>60</number>
+      <picker>0</picker>
+      <prettyName>NGS Material</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </ngs_material>
+
     <family_history>
       <contenttype>PureText</contenttype>
       <customDisplay/>
