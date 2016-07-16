@@ -23,6 +23,5 @@
     "http://www.puppycrawl.com/dtds/suppressions_1_0.dtd">
 
 <suppressions>
-  <suppress checks="MultipleStringLiterals" files="JsonMedSavantServer.java"/>
-  <suppress checks="ClassFanOutComplexity" files="JsonMedSavantServer.java"/>
+  <suppress checks=".*" files="SampleInformationController.java"/>
 </suppressions>

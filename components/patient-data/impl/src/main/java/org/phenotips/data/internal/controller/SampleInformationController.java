@@ -37,11 +37,11 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
-import org.json.JSONException;
 
 import org.xwiki.component.annotation.Component;
 
-import org.json.JSONObject;
+import net.sf.json.JSONException;
+import net.sf.json.JSONObject;
 
 import org.phenotips.configuration.RecordConfigurationManager;
 import org.phenotips.data.DictionaryPatientData;
