@@ -158,7 +158,7 @@ public class SampleInformationController implements PatientDataController<Object
     @Override
     public void writeJSON(Patient patient, JSONObject json, Collection<String> selectedFieldNames)
     {
-        PatientData<String> data = patient.getData(getName());
+        PatientData<Object> data = patient.getData(getName());
         if (data == null || !data.isNamed()) {
             return;
         }
@@ -182,7 +182,10 @@ public class SampleInformationController implements PatientDataController<Object
                 new SimpleDateFormat(this.configurationManager.getActiveConfiguration().getISODateFormat());
 
             for (String identifierName : DATE_IDENTIFIERS) {
-                container.put(identifierName, dateFormat.format(data.get(identifierName)));
+                final Date dateValue = (Date) data.get(identifierName);
+                if (dateValue != null) {
+                    container.put(identifierName, dateFormat.format(dateValue));
+                }
             }
 
             for (String identifierName : STRING_IDENTIFIERS) {
